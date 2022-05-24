@@ -1,0 +1,9 @@
+studytime 
+failures 
+schoolsup 
+famsup 
+paid 
+higher 
+internet 
+health 
+absences 
