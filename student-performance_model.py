@@ -18,90 +18,100 @@ from sklearn.ensemble import RandomForestRegressor
 # In[2]:
 
 
-data = pandas.read_csv('maths.csv', sep=";") 
+pd = pandas.read_csv('maths.csv', sep=";") 
 
 
 # In[3]:
 
 
-data.head(5)
+pd.isnull().any()
 
 
 # In[4]:
 
 
-std_data = data.copy()
+pd = pd.dropna(how='any',axis=0) 
 
 
 # In[5]:
 
 
-def grade_calculation(mark):
-    if mark >= 17:
-        grade = 'A'
-    elif mark >= 13:
-        grade = 'B'
-    elif mark >= 9:
-        grade = 'C'
-    else:
-        grade = 'F'
-    return grade
-
-std_data["G1Grade"] = data["G1"].apply(lambda mark: grade_calculation(mark))
-std_data["G2Grade"] = data["G2"].apply(lambda mark: grade_calculation(mark))
-std_data["G3Grade"] = data["G3"].apply(lambda mark: grade_calculation(mark))
+pd.head(5)
 
 
 # In[6]:
 
 
-std_data = std_data.drop(['G1'], axis=1)
-std_data = std_data.drop(['G2'], axis=1)
-std_data = std_data.drop(['G3'], axis=1)
+Performance_data = pd.copy()
 
 
 # In[7]:
 
 
-std_data.head()
+def grade_calculation(value):
+    if value >= 16:
+        grade = 'A'
+    elif value >= 12:
+        grade = 'B'
+    elif value >= 8:
+        grade = 'C'
+    else:
+        grade = 'F'
+    return grade
+
+Performance_data["Grade_G1"] = pd["G1"].apply(lambda value: grade_calculation(value))
+Performance_data["Grade_G2"] = pd["G2"].apply(lambda value: grade_calculation(value))
+Performance_data["Grade_G3"] = pd["G3"].apply(lambda value: grade_calculation(value))
 
 
 # In[8]:
 
 
-catergorical_columns = ['school', 'sex', 'address', 'famsize', 'Pstatus', 'Mjob', 'Fjob',
-       'reason', 'guardian', 'schoolsup', 'famsup', 'paid', 'activities',
-       'nursery', 'higher', 'internet', 'romantic', 'G1Grade', 'G2Grade',
-       'G3Grade']
+Performance_data = Performance_data.drop(['G1','G2','G3'], axis=1)
 
 
 # In[9]:
 
 
-label_encoder = LabelEncoder()
+Performance_data.head()
 
 
 # In[10]:
 
 
-for col in catergorical_columns:
-    std_data[col] = label_encoder.fit_transform(list(std_data[col]))
+catergorical_columns = ['school', 'sex', 'address', 'famsize', 'Pstatus', 'Mjob', 'Fjob',
+       'reason', 'guardian', 'schoolsup', 'famsup', 'paid', 'activities',
+       'nursery', 'higher', 'internet', 'romantic', 'Grade_G1', 'Grade_G2',
+       'Grade_G3']
 
 
 # In[11]:
 
 
-std_data.head()
+label_encoder = LabelEncoder()
 
 
 # In[12]:
 
 
-X=std_data.drop(['G3Grade'],axis=1)
-Y = std_data['G3Grade']
+for col in catergorical_columns:
+    Performance_data[col] = label_encoder.fit_transform(list(Performance_data[col]))
 
 
 # In[13]:
+
+
+Performance_data.head()
+
+
+# In[14]:
+
+
+X=Performance_data.drop(['Grade_G3'],axis=1)
+Y = Performance_data['Grade_G3']
+
+
+# In[15]:
 
 
 X_train,X_test,Y_train,Y_test=train_test_split(X,Y,test_size=0.15, random_state=70)
@@ -109,32 +119,32 @@ X_train,X_test,Y_train,Y_test=train_test_split(X,Y,test_size=0.15, random_state=
 
 # # Prediction With Linear Regression Model
 
-# In[14]:
+# In[16]:
 
 
 reg = linear_model.LinearRegression()
 reg.fit(X_train, Y_train)
 
 
-# In[15]:
+# In[17]:
 
 
 LR_Predict = reg.predict(X_test)
 
 
-# In[16]:
+# In[18]:
 
 
 LR_score = reg.score(X_test, Y_test)
 
 
-# In[17]:
+# In[19]:
 
 
 LR_score
 
 
-# In[18]:
+# In[20]:
 
 
 sns.distplot(Y_test,hist=False,color='r',label="Actucal Value")
@@ -149,37 +159,37 @@ plt.close()
 
 # # Prediction With Random Forest Model
 
-# In[19]:
+# In[21]:
 
 
 model_RF = RandomForestRegressor(n_estimators=1000)
 
 
-# In[20]:
+# In[22]:
 
 
 model_RF.fit(X_train, Y_train)
 
 
-# In[21]:
+# In[23]:
 
 
 RF_Predict = model_RF.predict(X_test)
 
 
-# In[22]:
+# In[24]:
 
 
 RF_score= model_RF.score(X_test, Y_test)
 
 
-# In[23]:
+# In[25]:
 
 
 RF_score
 
 
-# In[24]:
+# In[26]:
 
 
 sns.distplot(Y_test,hist=False,color='r',label="Actucal Value")
@@ -194,37 +204,37 @@ plt.close()
 
 # # Prediction With Decision Tree Model
 
-# In[25]:
+# In[27]:
 
 
 model_DT = tree.DecisionTreeRegressor()
 
 
-# In[26]:
+# In[28]:
 
 
 model_DT.fit(X_train, Y_train)
 
 
-# In[27]:
+# In[29]:
 
 
 DT_Predict = model_DT.predict(X_test)
 
 
-# In[28]:
+# In[30]:
 
 
 DT_score= model_DT.score(X_test, Y_test)
 
 
-# In[29]:
+# In[31]:
 
 
 DT_score
 
 
-# In[30]:
+# In[32]:
 
 
 sns.distplot(Y_test,hist=False,color='r',label="Actucal Value")
@@ -245,51 +255,51 @@ plt.close()
 
 
 
-# In[31]:
+# In[33]:
 
 
 pf = PolynomialFeatures(degree=3,include_bias=False)
 pf
 
 
-# In[32]:
+# In[34]:
 
 
 X = pf.fit_transform(X)
 
 
-# In[33]:
+# In[35]:
 
 
 X_train,X_test,Y_train,Y_test=train_test_split(X,Y,test_size=0.15, random_state=51)
 
 
-# In[34]:
+# In[36]:
 
 
 model_PR = linear_model.LinearRegression()
 model_PR.fit(X_train, Y_train)
 
 
-# In[35]:
+# In[37]:
 
 
 y_hat = model_PR.predict(X_test)
 
 
-# In[36]:
+# In[38]:
 
 
 PR_score= model_PR.score(X_test, Y_test)
 
 
-# In[37]:
+# In[39]:
 
 
 PR_score
 
 
-# In[38]:
+# In[40]:
 
 
 sns.distplot(Y_test,hist=False,color='r',label="Actucal Value")
@@ -300,4 +310,26 @@ plt.xlabel('Score')
 plt.ylabel('Grade')
 plt.show()
 plt.close()
+
+
+# In[41]:
+
+
+print("Multiple Linear Regression Model Score is ", round(LR_score*100))
+print("Decision tree  Regression Model Score is ",round(DT_score*100))
+print("Random Forest Regression Model Score is ",round(RF_score*100))
+print("Polynomial Regression Model Score is ",round(PR_score*100))
+
+models_score =pandas.DataFrame({'Model':['Multiple Linear Regression','Decision Tree','Random forest Regression'],
+                            'Score':[LR_score,DT_score,RF_score]
+                           })
+models_score.sort_values(by='Score',ascending=False)
+
+
+# In[42]:
+
+
+import pickle
+filename='student_model.pkl'
+pickle.dump(model_RF, open(filename, 'wb'))
 
