@@ -24,6 +24,7 @@ import pickle
 # In[2]:
 
 
+# Read the dataset 
 data = pd.read_csv('student-mat.csv',sep = ";")
 data
 
@@ -31,25 +32,35 @@ data
 # In[3]:
 
 
-data["G3"].describe()
+# copy the dataset into a new variable
+std_data = data.copy()
 
 
 # In[4]:
 
 
-data.shape
+#Display the stastistical summary
+data["G3"].describe()
 
 
 # In[5]:
 
 
-data.isnull().any()
+# Display the dimensions of datset
+data.shape
 
 
 # In[6]:
 
 
-#Duplicate value find and remove
+# Find null values in dataset
+data.isnull().any()
+
+
+# In[7]:
+
+
+# Find duplicate values and remove
 
 def removingDuplicates(data):
     duplicateCount = data.duplicated().sum()
@@ -63,9 +74,10 @@ def removingDuplicates(data):
 removingDuplicates(data)
 
 
-# In[7]:
+# In[8]:
 
 
+# Data visualize using count plot
 def dataVizual(data):
     plt.figure(figsize=(16, 9))
     dv = sns.countplot(data["G3"] )
@@ -89,9 +101,10 @@ classesVizualization(data)
     
 
 
-# In[8]:
+# In[9]:
 
 
+#Calculate average marks and assign into new column
 def Add_average_marks_to_data(data):
     data["GradeAvarage"] = (data["G1"] + data["G2"] + data["G3"]) /3
  
@@ -101,9 +114,10 @@ data
 
 
 
-# In[9]:
+# In[10]:
 
 
+#Grade classification according to average mark
 def gradeAllocation(data):
     All_Students_grades = []
     
@@ -133,37 +147,41 @@ def gradeAllocation(data):
     
 
 
-# In[10]:
+# In[11]:
 
 
 PreprosesData = gradeAllocation(data)
 
 
-# In[11]:
+# In[12]:
 
 
+#Drop StudentLevel column from encoding
 encoding = PreprosesData.drop("StudentLevel", axis=1)
 
+#Get all non numeric columns
 object_cols = encoding.select_dtypes(include=[np.object])
 print(object_cols.columns)
 
 
 label_encoder = preprocessing.LabelEncoder()
 
-# loop through every non numeric object
+# Encode all non numeric column loop through
 for col in object_cols:
     PreprosesData[col] = label_encoder.fit_transform(list(encoding[col]))
-
-
-# In[12]:
-
-
-PreprosesData.head()
 
 
 # In[13]:
 
 
+# Display the head of output
+PreprosesData.head()
+
+
+# In[14]:
+
+
+# Split dataset for testing and training.
 def read_in_and_split_data(data,label):
     X = data.drop(label, axis=1)
     y = data[label]
@@ -171,9 +189,55 @@ def read_in_and_split_data(data,label):
     return X_train, X_test, y_train, y_test
 
 
-# In[14]:
+# In[15]:
 
 
+# defining the grade calculation method
+def calc_grade(mark):
+    if mark >= 17:
+        grading = 'A'
+    elif mark >= 13:
+        grading = 'B'
+    elif mark >= 9:
+        grading = 'C'
+    else:
+        grading = 'F'
+    return grading
+
+# assigning grades into a new column
+std_data["G1Grade"] = data["G1"].apply(lambda mark: calc_grade(mark))
+std_data["G2Grade"] = data["G2"].apply(lambda mark: calc_grade(mark))
+std_data["G3Grade"] = data["G3"].apply(lambda mark: calc_grade(mark))
+
+
+# In[16]:
+
+
+# removing the old attributes
+std_data = std_data.drop(['G1'], axis=1)
+std_data = std_data.drop(['G2'], axis=1)
+std_data = std_data.drop(['G3'], axis=1)
+
+
+# In[17]:
+
+
+# display the head of the modified dataset
+std_data.head()
+
+
+# In[18]:
+
+
+# plot the correlation of the datatset
+plt.figure(figsize=(20, 20))
+sns.heatmap(std_data.corr().round(2), annot=True)
+
+
+# In[19]:
+
+
+# Calculate and plot the model acuracy
 def classification_metrics(model, conf_matrix):
     print(f"Training Accuracy Score: {model.score(X_train, y_train) * 100:.1f}%")
     print(f"Validation Accuracy Score: {model.score(X_test, y_test) * 100:.1f}%")
@@ -188,25 +252,13 @@ def classification_metrics(model, conf_matrix):
     print(classification_report(y_test, y_pred))
 
 
-# In[15]:
+# In[20]:
 
 
 lable ='StudentLevel'
 X_train, X_test, y_train, y_test = read_in_and_split_data(PreprosesData, lable)
 
-# Train model
-
-#Machinelearning_Algorithmn=RandomForestClassifier()
-#model = Machinelearning_Algorithmn.fit(X_train, y_train)
-#prediction = model.predict(X_test) # make predictions based on test data
-#error = abs(prediction - y_test)
-
-#print(f"Training Accuracy Score: {model.score(X_train, y_train) * 100:.1f}%")
-#print(f"Validation Accuracy Score: {model.score(X_test, y_test) * 100:.1f}%")
-
-#y_pred = model.predict(X_test)
-#conf_matrix = confusion_matrix(y_test,y_pred)
-
+# Implement the Random Forest Classifier algorithem
 pipeline = make_pipeline(StandardScaler(),  RandomForestClassifier())
 model = pipeline.fit(X_train, y_train)
 y_pred = model.predict(X_test)
@@ -214,8 +266,9 @@ conf_matrix = confusion_matrix(y_test,y_pred)
 classification_metrics(pipeline, conf_matrix)
 
 
-# In[16]:
+# In[21]:
 
 
+# Export the trained model as pickle file
 pickle.dump(model, open("student_perfomence.pkl", 'wb'))
 
