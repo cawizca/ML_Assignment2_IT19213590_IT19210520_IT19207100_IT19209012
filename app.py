@@ -16,13 +16,12 @@ def load_model(modelfile):
 
 school = 0 
 sex =0
-age =15
 address=1
 famsize = 0
 Pstatus =1
 Medu =4
 Fedu = 2
-Mjob =1
+Mjob =0
 Fjob =3
 reason=5
 guardian=0
@@ -33,9 +32,9 @@ schoolsup =1
 famsup=1
 paid=1
 activities =1
-nursery=1
-higher =1
-internet=1
+nursery=0
+higher =0
+internet=0
 romantic=0
 famrel=0
 freetime=2
@@ -44,16 +43,13 @@ Dalc =2
 Walc =1
 health =0
 absences =1
-G1 =15
-G2 =14
-G3 =16
-GradeAvarage = (G1+G2+G3)
+G1 =20
+G2 =20
 
-feature_list = [school,sex,age,address,famsize,Pstatus,Medu,Fedu,Mjob,Fjob,reason,guardian,traveltime,studytime,failures,schoolsup,famsup,paid,activities,nursery,higher,internet,romantic,famrel,freetime,goout,Dalc,Walc,health,absences,G1,G2,G3,GradeAvarage]
+feature_list = [school,sex,address,famsize,Pstatus,Medu,Fedu,Mjob,Fjob,reason,guardian,traveltime,studytime,failures,schoolsup,famsup,paid,activities,nursery,higher,internet,romantic,famrel,freetime,goout,Dalc,Walc,health,absences,G1,G2]
 single_pred = np.array(feature_list).reshape(1,-1)
         
        
-
 loaded_model = load_model('student_perfomence.pkl')
 prediction = loaded_model.predict(single_pred)
 
